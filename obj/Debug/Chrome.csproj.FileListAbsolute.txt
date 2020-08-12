@@ -1,0 +1,8 @@
+C:\Users\h13\source\repos\Chrome\bin\Debug\Chrome.exe
+C:\Users\h13\source\repos\Chrome\bin\Debug\Chrome.pdb
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.csprojAssemblyReference.cache
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.Properties.Resources.resources
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.csproj.GenerateResource.cache
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.csproj.CoreCompileInputs.cache
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.exe
+C:\Users\h13\source\repos\Chrome\obj\Debug\Chrome.pdb
