@@ -1,87 +1,49 @@
-# Browser Lawncher
-别名: 去他妈的主页劫持
+﻿# App Launcher
 
-## 用途: 
-避免流氓软件通过修改快捷方式来劫持主页
-eg: 
-![](./img/eg.png)
+一个将目标程序强制以后台方式启动的通用小工具。它固定读取与可执行文件位于同一目录的 `AppLauncher.yaml` 配置文件，解析目标可执行文件以及命令行参数，并在没有控制台窗口的情况下拉起目标进程。项目使用 C++ 实现，可静态链接运行库，在全新 Windows 环境下也能直接运行。
 
-## 原理:
-生成一个exe,调用cmd直接打开对应浏览器
-即本exe等效于:
-cmd下自动输入:
-```
-"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-```
+## 功能特点
+- 通过 YAML 描述目标程序、启动参数以及可选的工作目录
+- 支持相对路径，默认相对于配置文件所在目录解析
+- 以隐藏窗口方式启动，避免闪过命令行窗口
+- 启动失败时给出清晰的错误提示
 
-## 使用方法:
-建议使用 `Browser Lawncher Lawncher` 来进行可视化设置 (禁止套娃)
-https://github.com/h13-0/Browser-Lawncher-Lawncher
-如果选择使用 `Browser Lawncher Lawncher` 来配置的话,配置过程会相当简单,下文中 `手动配置方法` 可以直接略过了,具体详见对应项目主页。
+## 配置方法
+无论最终发布的程序名为何，只需在同一目录提供 `AppLauncher.yaml`。示例：
 
-## 手动配置方法
-### 配置文件Demo:
-```
-C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
-https://www.google.com
-```
-或者
-```
-C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
-```
-**第一行是你浏览器的文件位置,第二行开始是参数,参数可以是自定义主页等等**
-
-### exe配置文件工作方式
-exe在启动时,会读取同目录文件夹下的同名的配置文件
-比如exe储存在:
-```
-C:\Users\h13\Documents\Chrome\Chrome.exe
-```
-则其会读取:
-```
-C:\Users\h13\Documents\Chrome\Chrome.exe.conf
+```yaml
+executable: tools\my-service.exe
+workingDirectory: tools
+arguments:
+  - --port
+  - "8080"
+  - --log-level=info
 ```
 
-随后程序会检测第一行对应文件是否存在,如果存在则执行cmd命令,不存在则弹窗提示。
+- `executable`：[必选]可执行文件路径。可以填写绝对路径，也可以填写相对路径（相对于 YAML 文件所在目录）
+- `workingDirectory`：[可选]执行目标程序时所在路径。未配置时保持目标程序所在目录
+- `arguments`：[可选]执行时的参数列表。支持行内写法 `[--flag, value]` 或逐行 `-` 形式
 
-所以本程序虽然名称为 `Chrome.exe` 但是你可以拿它打开 `Edge` 等任何浏览器。Chrome.exe只是一个Demo.
+保存配置后，直接运行 `AppLauncher.exe`（或任何重命名后的可执行文件），工具都会读取 `AppLauncher.yaml` 并以后台方式启动目标程序。若找不到配置文件、可执行文件不存在或其他异常情况，会弹出消息框并退出。
 
-### 手动使用方法:
+### 使用 >> 记录日志
+由于本程序未直接支持重定向输出日志，因此可使用如下的方法间接重定向目录。
 
-解压Release后有如下文件
-![](./img/unzip.png)
-
-只需要提取
-```
-Chrome.exe
-Chrome.exe.conf
-```
-这两个文件到一个任意一个没有权限的目录,这里我选择的是 `%USERPROFILE%\Documents\Browser Lawncher\Chrome` 即个人文档文件夹。
-
-然后
-![](./img/1.png)
-按照需求填写配置文件
-
-创建快捷方式
-![](./img/2.png)
-
-美化一下,借用Chrome的图片
-![](./img/3.png)
-
-随后无论是固定到开始菜单还是放到桌面还是干什么都很简单
-![](./img/4.png)
-
-### 举一反三
-Edge也是如此。
-
-解压到任意一个文件夹
-
-修改配置文件
-```
-C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
-https://github.com/
+```yaml
+executable: C:\Windows\System32\cmd.exe
+arguments:
+ - /c
+ - C:\path\target.exe >> C:\path\target.log
 ```
 
-创建快捷方式,借用图标
-![](./img/5.png)
-完事
+## 常见问题
+- **如何快速测试？** 可将 `executable` 指向系统自带的 `notepad.exe`，添加需要的文件路径作为参数
+- **需要管理员权限吗？** 不需要，只要对目标程序和工作目录有执行访问权限即可
+- **可以放在任何位置吗？** 可以，把可执行文件和 `AppLauncher.yaml` 放在同一目录即可，配置中的相对路径会以该目录为起点解析
+
+## 构建
+本项目使用 Visual Studio (C++/Win32) 工程，默认生成无控制台窗口的可执行文件：
+
+1. 打开 `AppLauncher.sln`
+2. 在“生成”菜单中选择所需的目标（建议 Win32）
+3. 为了在无运行库的环境下运行，工程默认使用静态 CRT (`/MT`)，编译出的 exe 可直接分发
